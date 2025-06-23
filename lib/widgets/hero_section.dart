@@ -3,29 +3,36 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rahul_resume/utils/download_helper.dart';
 import '../routes/app_routes.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
 
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+       // color: isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
         image: DecorationImage(
-          image: const AssetImage('assets/homescreen.png'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(0.5),
-            BlendMode.darken,
+          image: AssetImage(
+            isDarkMode ? 'assets/homescreen.png' : 'assets/lightMode_homescreen.png'
           ),
+          fit: BoxFit.cover,
+          // colorFilter: ColorFilter.mode(
+          //   // isDarkMode ? Colors.black.withOpacity(0.5) : Colors.white.withOpacity(0.9),
+          //   isDarkMode ? BlendMode.darken : BlendMode.lighten,
+          // ),
         ),
       ),
       child: Stack(
         children: [
-          // Pink accent line
+          // Accent line
           Positioned(
             left: 0,
             top: MediaQuery.of(context).size.height * 0.3,
@@ -49,28 +56,21 @@ class HeroSection extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 42,
                     fontWeight: FontWeight.w300,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white,
                     letterSpacing: -0.5,
+                    decoration: TextDecoration.none,
                   ),
                 ),
                 const SizedBox(height: 8),
-                ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      const Color(0xFF0066FF),
-                      const Color(0xFF0066FF).withOpacity(0.8),
-                      Colors.white,
-                    ],
-                  ).createShader(bounds),
-                  child: Text(
-                    'Flutter Developer',
-                    style: GoogleFonts.inter(
-                      fontSize: 56,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: -1,
-                      height: 1.1,
-                    ),
+                Text(
+                  'Flutter Developer',
+                  style: GoogleFonts.inter(
+                    fontSize: 56,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF0066FF),
+                    letterSpacing: -1,
+                    height: 1.1,
+                    decoration: TextDecoration.none,
                   ),
                 ),
                 Text(
@@ -80,6 +80,7 @@ class HeroSection extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                     color: Colors.white,
                     letterSpacing: -0.5,
+                    decoration: TextDecoration.none,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -135,13 +136,14 @@ class HeroSection extends StatelessWidget {
                   color: const Color(0xFF0066FF),
                   margin: const EdgeInsets.only(right: 8),
                 ),
-                const Text(
-                  'Let\'s Rock!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
+                                  const Text(
+                    'Let\'s Rock!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      decoration: TextDecoration.none,
+                    ),
                 ),
               ],
             ),
@@ -165,23 +167,44 @@ class HeroSection extends StatelessWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
+                      decoration: TextDecoration.none,
                     ),
                   ),
                   Row(
                     children: [
-                      _buildNavItem('Resume', onTap: () => Get.toNamed(AppRoutes.resume)),
-                      _buildNavItem('About Me', onTap: () => Get.toNamed(AppRoutes.aboutMe)),
-                      _buildNavItem('Portfolio', onTap: () => Get.toNamed(AppRoutes.portfolio)),
-                      _buildNavItem('Blog', onTap: () => Get.toNamed(AppRoutes.blog)),
-                      _buildNavItem('Contact', onTap: () => Get.toNamed(AppRoutes.contact)),
+                      _buildNavItem('About', isDarkMode: isDarkMode, onTap: () => Get.toNamed(AppRoutes.aboutMe)),
+                      _buildNavItem('Projects', isDarkMode: isDarkMode, onTap: () => Get.toNamed(AppRoutes.portfolio)),
+                      _buildNavItem('Blog', isDarkMode: isDarkMode, onTap: () => Get.toNamed(AppRoutes.blog)),
+                      _buildNavItem('Resume', isDarkMode: isDarkMode, onTap: () => Get.toNamed(AppRoutes.resume)),
+                      _buildNavItem('Contact', isDarkMode: isDarkMode, onTap: () => Get.toNamed(AppRoutes.contact)),
                     ],
                   ),
                   Row(
                     children: [
-                      _buildSocialIcon(Icons.public),
-                      _buildSocialIcon(Icons.alternate_email),
-                      _buildSocialIcon(Icons.business_center),
-                      _buildSocialIcon(Icons.photo_camera),
+                      _buildSocialIcon(Icons.public, isDarkMode: isDarkMode),
+                      _buildSocialIcon(Icons.alternate_email, isDarkMode: isDarkMode),
+                      _buildSocialIcon(Icons.business_center, isDarkMode: isDarkMode),
+                      _buildSocialIcon(Icons.photo_camera, isDarkMode: isDarkMode),
+                      // Theme toggle button
+                      Container(
+                        margin: const EdgeInsets.only(left: 16),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: (isDarkMode ? Colors.white : Colors.black).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            themeProvider.toggleTheme();
+                          },
+                          tooltip: isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -193,7 +216,7 @@ class HeroSection extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(String text, {VoidCallback? onTap}) {
+  Widget _buildNavItem(String text, {required bool isDarkMode, VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: TextButton(
@@ -210,7 +233,7 @@ class HeroSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialIcon(IconData icon) {
+  Widget _buildSocialIcon(IconData icon, {required bool isDarkMode}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: IconButton(

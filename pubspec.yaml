@@ -79,6 +79,7 @@ flutter:
     - assets/serveizlogin.jpg
     - assets/serveizmenudrawer.jpg
     - assets/homescreen.png
+    - assets/lightMode_homescreen.png
     - assets/resume.pdf
 
   # An image asset can refer to one or more resolution-specific "variants", see
