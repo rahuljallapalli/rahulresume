@@ -62,15 +62,22 @@ class HeroSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Flutter Developer',
-                  style: GoogleFonts.inter(
-                    fontSize: 56,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0066FF),
-                    letterSpacing: -1,
-                    height: 1.1,
-                    decoration: TextDecoration.none,
+                ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Color(0xFF0066FF), Color(0xFF00C6FF), Color.fromARGB(255, 189, 189, 189)], // blue to cyan gradient
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+                  child: Text(
+                    'Flutter Developer',
+                    style: GoogleFonts.inter(
+                      fontSize: 56,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white, // This will be masked by the gradient
+                      letterSpacing: -1,
+                      height: 1.1,
+                      decoration: TextDecoration.none,
+                    ),
                   ),
                 ),
                 Text(
@@ -84,43 +91,7 @@ class HeroSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () {
-                    DownloadHelper.downloadFile(
-                      'assets/resume.pdf',
-                      'Rahul_Jallapalli_Resume.pdf',
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0066FF),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.download_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Download Resume',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _AnimatedDownloadButton(),
               ],
             ),
           ),
@@ -244,6 +215,74 @@ class HeroSection extends StatelessWidget {
           icon,
           color: Colors.white,
           size: 20,
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedDownloadButton extends StatefulWidget {
+  @override
+  State<_AnimatedDownloadButton> createState() => _AnimatedDownloadButtonState();
+}
+
+class _AnimatedDownloadButtonState extends State<_AnimatedDownloadButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: Semantics(
+        label: 'Download Resume (PDF)',
+        button: true,
+        child: ElevatedButton(
+          onPressed: () {
+            DownloadHelper.downloadFile(
+              'assets/resume.pdf',
+              'Rahul_Jallapalli_Resume.pdf',
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF0066FF),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            transform: _isHovered
+                ? (Matrix4.identity()..scale(1.05))
+                : Matrix4.identity(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedPadding(
+                  duration: const Duration(milliseconds: 200),
+                  padding: EdgeInsets.only(right: _isHovered ? 16 : 8),
+                  child: Icon(
+                    Icons.download_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: _isHovered ? 1.5 : 0.5,
+                    color: Colors.white,
+                  ),
+                  child: const Text('Download Resume (PDF)'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
